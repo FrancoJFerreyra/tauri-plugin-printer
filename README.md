@@ -48,9 +48,9 @@ Supports PDF/HTML printing, printer management, print job control, and more.
    // src-tauri/capabilities/default.json
    {
      "permissions": [
-       "printer:allow-get-printers",
-       "printer:allow-print-pdf",
-       "printer:allow-print-html"
+       "printer-wkhtml-bin:allow-get-printers",
+       "printer-wkhtml-bin:allow-print-pdf",
+       "printer-wkhtml-bin:allow-print-html"
      ]
    }
    ```
@@ -137,7 +137,7 @@ pub fn run() {
 ```json
 {
   "permissions": [
-    "printer:default"
+    "printer-wkhtml-bin:default"
   ]
 }
 ```

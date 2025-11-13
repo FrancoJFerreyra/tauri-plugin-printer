@@ -1,6 +1,6 @@
 [package]
 name = "tauri-plugin-printer-wkhtml-bin"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Franco J. Ferreyra <ferreyrafranco0802@gmail.com>"]
 description = "Tauri plugin for printer with embedded wkhtmltopdf for Windows"
 edition = "2021"

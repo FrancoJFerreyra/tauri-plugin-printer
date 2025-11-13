@@ -51,8 +51,8 @@ export interface PrintHtmlOptions {
   page_size?: string 
   orientation?: "portrait" | "landscape"  
   margin?: PrintMargin
-  quality?: string
-  grayscale?: string 
+  quality?: number //1-100
+  grayscale?: boolean 
   copies?: number
 }
 
