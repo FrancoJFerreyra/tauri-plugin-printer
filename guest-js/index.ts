@@ -26,7 +26,7 @@ export interface PrintPdfOptions {
 }
 
 export async function printPdf(options: PrintPdfOptions): Promise<string> {
-  console.log('打印配置pdf:', options);
+  console.log('Print configuration pdf:', options);
   return await invoke<string>('plugin:printer-wkhtml-bin|print_pdf', {
     id: options.id,
     path: options.path,
@@ -44,20 +44,20 @@ export interface PrintMargin {
 }
 
 export interface PrintHtmlOptions {
-  html: string;
-  printer_id?: string;
-  print_settings?: string;
-  remove_after_print?: boolean;
-  page_size?: string;
-  orientation?: string;
-  margin?: PrintMargin;
-  quality?: number;
-  grayscale?: boolean;
-  copies?: number;
+  html: string
+  printer: string 
+  page_width?: number 
+  page_height?: number  
+  page_size?: string 
+  orientation?: "portrait" | "landscape"  
+  margin?: PrintMargin
+  quality?: string
+  grayscale?: string 
+  copies?: number
 }
 
 export async function printHtml(options: PrintHtmlOptions): Promise<string> {
-  console.log('打印配置html:', options);
+  console.log('Print configuration html:', options);
   return await invoke<string>('plugin:printer-wkhtml-bin|print_html', {
     options: options
   });
