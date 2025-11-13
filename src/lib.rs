@@ -28,7 +28,7 @@ use desktop::Printer;
 use mobile::Printer;
 
 /**
- * 测试打印机连接
+ * Test printer connection
  */
 #[tauri::command]
 async fn ping<R: Runtime>(app: tauri::AppHandle<R>, payload: PingRequest) -> Result<PingResponse> {
@@ -36,7 +36,7 @@ async fn ping<R: Runtime>(app: tauri::AppHandle<R>, payload: PingRequest) -> Res
 }
 
 /**
- * 打印 HTML 内容
+ * Print HTML content
  */
 #[tauri::command(rename_all = "snake_case")]
 async fn print_html<R: Runtime>(app: tauri::AppHandle<R>, options: PrintHtmlOptions) -> Result<String> {
@@ -57,13 +57,13 @@ impl<R: Runtime, T: Manager<R>> crate::PrinterExt<R> for T {
 }
 
 /**
- * 创建临时文件
- * @param buffer_data base64字符串
- * @param filename 文件名
- * @returns 临时文件路径
+ * Create a temporary file
+ * @param buffer_data base64 string
+ * @param filename file name
+ * @returns temporary file path
  */
 #[tauri::command(rename_all = "snake_case")]
-// this will be accessible with `invoke('plugin:printer|create_temp_file')`.
+// this will be accessible with `invoke('plugin:printer-wkhtml-bin|create_temp_file')`.
 fn create_temp_file(buffer_data: String, filename: String) -> String {
     let dir = env::temp_dir();
     let result = fsys::create_file_from_base64(
@@ -77,12 +77,12 @@ fn create_temp_file(buffer_data: String, filename: String) -> String {
 }
 
 /**
- * 删除临时文件
- * @param filename 文件名
- * @returns 删除结果
+ * Remove temporary file
+ * @param filename file name
+ * @returns result of deletion
  */
 #[tauri::command(rename_all = "snake_case")]
-// this will be accessible with `invoke('plugin:printer|create_temp_file')`.
+// this will be accessible with `invoke('plugin:printer-wkhtml-bin|create_temp_file')`.
 fn remove_temp_file(filename: String) -> bool {
     let dir = env::temp_dir();
     let result = fsys::remove_file(format!("{}{}", dir.display(), filename).as_str());
@@ -93,10 +93,10 @@ fn remove_temp_file(filename: String) -> bool {
 }
 
 /**
- * 获取打印机列表
+ * Get printer list
  */
 #[tauri::command]
-// this will be accessible with `invoke('plugin:printer|get_printers')`.
+// this will be accessible with `invoke('plugin:printer-wkhtml-bin|get_printers')`.
 fn get_printers() -> String {
     if cfg!(windows) {
         return windows::get_printers();
@@ -106,14 +106,14 @@ fn get_printers() -> String {
 }
 
 /**
- * 获取打印机列表
- * @param printername 打印机名称
- * @returns 打印机列表
+ * Get printer list by name
+ * @param printername printer name
+ * @returns printer list
  */
 #[tauri::command(rename_all = "snake_case")]
-// this will be accessible with `invoke('plugin:printer|get_printer_by_name')`.
+// this will be accessible with `invoke('plugin:printer-wkhtml-bin|get_printer_by_name')`.
 fn get_printers_by_name(printername: String) -> String {
-    println!("获取打印机列表: {}", printername);
+    println!("Getting printer list: {}", printername);
     if cfg!(windows) {
         return windows::get_printers_by_name(printername);
     }
@@ -122,15 +122,15 @@ fn get_printers_by_name(printername: String) -> String {
 }
 
 /**
- * 打印PDF
- * @param id 打印机ID
- * @param path PDF文件路径
- * @param printer_setting 打印机设置
- * @param remove_after_print 打印完成后删除文件
- * @returns 打印结果
+ * Print PDF
+ * @param id printer ID
+ * @param path PDF file path
+ * @param printer_setting printer settings
+ * @param remove_after_print remove file after printing
+ * @returns print result
  */
 #[tauri::command(rename_all = "snake_case")]    
-// this will be accessible with `invoke('plugin:printer|print_pdf')`.
+// this will be accessible with `invoke('plugin:printer-wkhtml-bin|print_pdf')`.
 fn print_pdf(
     id: String,
     path: String,
@@ -152,7 +152,7 @@ fn print_pdf(
 }
 
 #[tauri::command(rename_all = "snake_case")]
-// this will be accessible with `invoke('plugin:printer|get_jobs')`.
+// this will be accessible with `invoke('plugin:printer-wkhtml-bin|get_jobs')`.
 fn get_jobs(printername: String) -> String {
     if cfg!(windows) {
         return windows::get_jobs(printername);
@@ -161,13 +161,13 @@ fn get_jobs(printername: String) -> String {
 }
 
 /**
- * 获取打印任务列表
- * @param printername 打印机名称
- * @param jobid 打印任务ID
- * @returns 打印任务列表
+ * Get print job list
+ * @param printername printer name
+ * @param jobid print job ID
+ * @returns job list
  */
 #[tauri::command(rename_all = "snake_case")]
-// this will be accessible with `invoke('plugin:printer|get_jobs_by_id')`.
+// this will be accessible with `invoke('plugin:printer-wkhtml-bin|get_jobs_by_id')`.
 fn get_jobs_by_id(printername: String, jobid: String) -> String {
     if cfg!(windows) {
         return windows::get_jobs_by_id(printername, jobid);
@@ -176,13 +176,13 @@ fn get_jobs_by_id(printername: String, jobid: String) -> String {
 }
 
 /**
- * 恢复打印任务
- * @param printername 打印机名称
- * @param jobid 打印任务ID
- * @returns 恢复结果
+ * Resume print job
+ * @param printername printer name
+ * @param jobid print job ID
+ * @returns resume result
  */
 #[tauri::command(rename_all = "snake_case")]
-// this will be accessible with `invoke('plugin:printer|restart_job')`.
+// this will be accessible with `invoke('plugin:printer-wkhtml-bin|restart_job')`.
 fn resume_job(printername: String, jobid: String) -> String {
     if cfg!(windows) {
         return windows::resume_job(printername, jobid);
@@ -191,13 +191,13 @@ fn resume_job(printername: String, jobid: String) -> String {
 }
 
 /**
- * 重启打印任务
- * @param printername 打印机名称
- * @param jobid 打印任务ID
- * @returns 重启结果
+ * Restart print job
+ * @param printername printer name
+ * @param jobid print job ID
+ * @returns restart result
  */
 #[tauri::command(rename_all = "snake_case")]
-// this will be accessible with `invoke('plugin:printer|restart_job')`.
+// this will be accessible with `invoke('plugin:printer-wkhtml-bin|restart_job')`.
 fn restart_job(printername: String, jobid: String) -> String {
     if cfg!(windows) {
         return windows::restart_job(printername, jobid);
@@ -206,13 +206,13 @@ fn restart_job(printername: String, jobid: String) -> String {
 }
 
 /**
- * 暂停打印任务
- * @param printername 打印机名称
- * @param jobid 打印任务ID
- * @returns 暂停结果
+ * Pause print job
+ * @param printername printer name
+ * @param jobid print job ID
+ * @returns pause result
  */
 #[tauri::command(rename_all = "snake_case")]
-// this will be accessible with `invoke('plugin:printer|pause_job')`.
+// this will be accessible with `invoke('plugin:printer-wkhtml-bin|pause_job')`.
 fn pause_job(printername: String, jobid: String) -> String {
     if cfg!(windows) {
         return windows::pause_job(printername, jobid);
@@ -221,13 +221,13 @@ fn pause_job(printername: String, jobid: String) -> String {
 }
 
 /**
- * 删除打印任务
- * @param printername 打印机名称
- * @param jobid 打印任务ID
- * @returns 删除结果
+ * Remove print job
+ * @param printername printer name
+ * @param jobid print job ID
+ * @returns remove result
  */
 #[tauri::command(rename_all = "snake_case")]
-// this will be accessible with `invoke('plugin:printer|remove_job')`.
+// this will be accessible with `invoke('plugin:printer-wkhtml-bin|remove_job')`.
 fn remove_job(printername: String, jobid: String) -> String {
     if cfg!(windows) {
         return windows::remove_job(printername, jobid);
@@ -236,9 +236,9 @@ fn remove_job(printername: String, jobid: String) -> String {
 }
 
 /**
- * 获取打印机列表
- * @param printername 打印机名称
- * @returns 打印机列表
+ * Get printer list by name
+ * @param printername printer name
+ * @returns printer list
  */
 pub fn custom_get_printers_by_name(printername: String) -> String {
     if cfg!(windows) {
@@ -249,12 +249,12 @@ pub fn custom_get_printers_by_name(printername: String) -> String {
 }
 
 /**
- * 打印PDF
- * @param id 打印机ID
- * @param path PDF文件路径
- * @param printer_setting 打印机设置
- * @param remove_after_print 打印完成后删除文件
- * @returns 打印结果
+ * Print PDF
+ * @param id printer ID
+ * @param path PDF file path
+ * @param printer_setting printer settings
+ * @param remove_after_print remove file after printing
+ * @returns print result
  */
 pub fn custom_print_pdf(
     id: String,
@@ -276,15 +276,15 @@ pub fn custom_print_pdf(
 }
 
 /**
- * 初始化插件
- * @returns 初始化结果
+ * Initialize the plugin
+ * @returns initialization result
  */
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
   if cfg!(windows) {
     windows::init_windows();
   }
-    Builder::new("printer")
+    Builder::new("printer-wkhtml-bin")
         .invoke_handler(tauri::generate_handler![
             ping,
             print_html,

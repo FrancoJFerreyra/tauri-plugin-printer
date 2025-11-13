@@ -1,7 +1,7 @@
 import { invoke } from '@tauri-apps/api/core'
 
 export async function ping(value: string): Promise<string | null> {
-  return await invoke<{value?: string}>('plugin:printer|ping', {
+  return await invoke<{value?: string}>('plugin:printer-wkhtml-bin|ping', {
     payload: {
       value,
     },
@@ -9,11 +9,11 @@ export async function ping(value: string): Promise<string | null> {
 }
 
 export async function getPrinters(): Promise<string> {
-  return await invoke<string>('plugin:printer|get_printers');
+  return await invoke<string>('plugin:printer-wkhtml-bin|get_printers');
 }
 
 export async function getPrinterByName(printerName: string): Promise<string> {
-  return await invoke<string>('plugin:printer|get_printers_by_name', {
+  return await invoke<string>('plugin:printer-wkhtml-bin|get_printers_by_name', {
     printername: printerName,
   });
 }
@@ -27,7 +27,7 @@ export interface PrintPdfOptions {
 
 export async function printPdf(options: PrintPdfOptions): Promise<string> {
   console.log('打印配置pdf:', options);
-  return await invoke<string>('plugin:printer|print_pdf', {
+  return await invoke<string>('plugin:printer-wkhtml-bin|print_pdf', {
     id: options.id,
     path: options.path,
     printer_setting: options.printer_setting,
@@ -58,7 +58,7 @@ export interface PrintHtmlOptions {
 
 export async function printHtml(options: PrintHtmlOptions): Promise<string> {
   console.log('打印配置html:', options);
-  return await invoke<string>('plugin:printer|print_html', {
+  return await invoke<string>('plugin:printer-wkhtml-bin|print_html', {
     options: options
   });
 }

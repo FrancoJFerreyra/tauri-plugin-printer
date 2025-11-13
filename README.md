@@ -1,33 +1,35 @@
 <div align="center">
 
-# Tauri Plugin Printer V2
+# Tauri Plugin Printer WKHTML-BIN (Tauri V2)
 
-[![Crates.io](https://img.shields.io/crates/v/tauri-plugin-printer-v2.svg)](https://crates.io/crates/tauri-plugin-printer-v2)
-[![NPM](https://img.shields.io/npm/v/tauri-plugin-printer-api.svg)](https://www.npmjs.com/package/tauri-plugin-printer-api)
+[![Crates.io](https://img.shields.io/crates/v/tauri-plugin-printer-wkhtml-bin.svg)](https://crates.io/crates/tauri-plugin-printer-wkhtml-bin)
+[![NPM](https://img.shields.io/npm/v/tauri-plugin-printer-wkhtml-bin.svg)](https://www.npmjs.com/package/tauri-plugin-printer-wkhtml-bin)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Tauri](https://img.shields.io/badge/Tauri-v2.0-orange.svg)](https://tauri.app/)
 
-**一个功能强大的 Tauri V2 打印机插件**
+**A powerful Tauri V2 printer plugin**
 
-支持 PDF/HTML 打印、打印机管理、任务控制等完整功能
+Supports PDF/HTML printing, printer management, print job control, and more.
 
-[安装](#-安装) • [使用](#-使用方法) • [API文档](#-api-文档) • [示例](#-示例)
+[Installation](#-installation) • [Usage](#-usage) • [API Documentation](#-api-documentation) • [Examples](#-examples)
 
 </div>
 
 ---
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 5分钟上手指南
+### 5-Minute Getting Started Guide
 
-1. **安装插件**
+**Important:** Make sure to place the `wkhtmltopdf.exe` binary inside the `src-tauri/bin` folder of your project. The plugin will automatically look for it there.
+
+1. **Install the plugin**
    ```bash
-   cargo add tauri-plugin-printer-v2
-   npm i tauri-plugin-printer-v2
+   cargo add tauri-plugin-printer-wkhtml-bin
+   npm i tauri-plugin-printer-wkhtml-bin
    ```
 
-2. **注册插件**
+2. **Register the plugin**
    ```rust
    // src-tauri/src/lib.rs
    use tauri_plugin_printer_v2::init;
@@ -41,7 +43,7 @@
    }
    ```
 
-3. **配置权限**
+3. **Configure permissions**
    ```json
    // src-tauri/capabilities/default.json
    {
@@ -53,72 +55,70 @@
    }
    ```
 
-4. **开始使用**
+4. **Start using**
    ```javascript
-   import { getPrinters, printPdf } from 'tauri-plugin-printer-v2';
+   import { getPrinters, printPdf } from 'tauri-plugin-printer-wkhtml-bin';
    
-   // 获取打印机
+   // Get printers
    const printers = JSON.parse(await getPrinters());
-   console.log('可用打印机:', printers);
+   console.log('Available printers:', printers);
    
-   // 打印PDF
+   // Print PDF
    await printPdf({
      path: '/path/to/document.pdf',
      printer: printers[0].name
    });
    ```
 
-🎉 **恭喜！** 您已成功集成打印机插件，现在可以开始打印文档了。
+🎉 **Congratulations!** You have successfully integrated the printer plugin and can now start printing documents.
 
-## 致谢
+## Acknowledgements
 
-本项目基于以下开源项目开发：
-- [alfianlensundev/tauri-plugin-printer](https://github.com/alfianlensundev/tauri-plugin-printer) - 原始 Tauri 打印机插件
-- [adao99/tauri-plugin-printer-v2](https://github.com/adao99/tauri-plugin-printer-v2) - Tauri v2.0 版本的打印机插件
+This project is based on the following open source projects:
+- [alfianlensundev/tauri-plugin-printer](https://github.com/alfianlensundev/tauri-plugin-printer)
+- [adao99/tauri-plugin-printer-v2](https://github.com/adao99/tauri-plugin-printer-v2)
+- [chen-collab's](https://github.com/chen-collab/tauri-plugin-printer)
 
-感谢原作者们的贡献和开源精神。
+Thanks to the original authors for their contributions and open source spirit.
 
-## ✨ 特性
+## ✨ Features
 
-- 🖨️ 获取系统打印机列表
-- 📄 打印 PDF 文件
-- 🌐 打印 HTML 内容
-- 📋 管理打印任务（暂停、恢复、重启、删除）
-- 🔍 按名称查询打印机
-- 📊 获取打印任务状态
-- 🌐 支持中文打印机名称
-- 🔧 完全兼容 Tauri V2 稳定版
+- 📦 Looks for `wkhtmltopdf` in `bin` folder inside `src-tauri`
+- 🛠️ Fixed TypeScript types
+- 📝 Updated comments from Chinese to English
 
-## 📦 安装
+## 📦 Installation
 
-### 方法一：使用 crates.io（推荐）
+**Important:** Make sure to place the `wkhtmltopdf.exe` binary inside the `src-tauri/bin` folder of your project. The plugin will automatically look for it there.
+
+### Method 1: Using crates.io (Recommended)
 
 ```bash
-# 添加 Rust 依赖
-cargo add tauri-plugin-printer-v2
+# Add Rust dependency
+cargo add tauri-plugin-printer-wkhtml-bin
 
-# 安装前端 API
-npm i tauri-plugin-printer-v2
+# Install frontend API
+npm i tauri-plugin-printer-wkhtml-bin
 ```
 
-### 方法二：使用 Tauri CLI
+### Method 2: Using Tauri CLI
 
 ```bash
-npx tauri add https://github.com/chen-collab/tauri-plugin-printer
+npx tauri add https://github.com/FrancoJFerreyra/tauri-plugin-printer
 ```
 
-### 方法三：手动安装
+### Method 3: Manual Installation
 
-1. 在 `Cargo.toml` 中添加依赖：
+1. Add dependency in `Cargo.toml`:
 
 ```toml
 [dependencies]
-tauri-plugin-printer-v2 = "0.2.0"
-# 或使用 Git 版本
-# tauri-plugin-printer-v2 = { git = "https://github.com/chen-collab/tauri-plugin-printer", branch = "chen" }
+tauri-plugin-printer-wkhtml-bin = "0.2.0"
+# Or use Git version
+# tauri-plugin-printer-wkhtml-bin = { git = "https://github.com/FrancoJFerreyra/tauri-plugin-printer" }
 ```
 
-2. 在 `src-tauri/src/lib.rs` 中注册插件：
+2. Register the plugin in `src-tauri/src/lib.rs`:
 
 ```rust
 use tauri_plugin_printer_v2::init;
@@ -132,7 +132,7 @@ pub fn run() {
 }
 ```
 
-3. 在 `src-tauri/capabilities/default.json` 中添加权限：
+3. Add permissions in `src-tauri/capabilities/default.json`:
 
 ```json
 {
@@ -142,29 +142,29 @@ pub fn run() {
 }
 ```
 
-4. 安装前端依赖：
+4. Install frontend dependency:
 
 ```bash
-npm i tauri-plugin-printer-v2
+npm i tauri-plugin-printer-wkhtml-bin
 ```
 
-## 🚀 使用方法
+## 🚀 Usage
 
-### 基础示例
+### Basic Example
 
 ```javascript
-import { ping, getPrinters } from 'tauri-plugin-printer-v2';
+import { ping, getPrinters } from 'tauri-plugin-printer-wkhtml-bin';
 
-// 测试插件连接
+// Test plugin connection
 const response = await ping({ value: 'Hello from frontend!' });
 console.log(response);
 
-// 获取打印机列表
+// Get printer list
 const printers = await getPrinters();
-console.log('可用打印机:', printers);
+console.log('Available printers:', printers);
 ```
 
-### 完整 API 示例
+### Full API Example
 
 ```javascript
 import {
@@ -179,15 +179,15 @@ import {
   restartJob,
   pauseJob,
   removeJob
-} from 'tauri-plugin-printer-v2';
+} from 'tauri-plugin-printer-wkhtml-bin';
 
-// 1. 获取所有打印机
+// 1. Get all printers
 const allPrinters = await getPrinters();
 
-// 2. 按名称获取特定打印机
+// 2. Get specific printer by name
 const specificPrinter = await getPrintersByName('Microsoft Print to PDF');
 
-// 3. 打印 PDF 文件
+// 3. Print PDF file
 const printResult = await printPdf({
   path: '/path/to/your/file.pdf',
   printer: 'Microsoft Print to PDF',
@@ -195,48 +195,48 @@ const printResult = await printPdf({
   subset: 'odd'
 });
 
-// 4. 打印 HTML 内容
+// 4. Print HTML content
 const htmlPrintResult = await printHtml({
-  html: '<h1>Hello World</h1><p>这是一个HTML打印测试</p>',
+  html: '<h1>Hello World</h1><p>This is a HTML print test</p>',
   printer: 'Microsoft Print to PDF'
 });
 
-// 5. 获取打印任务
+// 5. Get print jobs
 const jobs = await getJobs('Microsoft Print to PDF');
 
-// 6. 管理打印任务
+// 6. Manage print jobs
 const jobId = '123';
 const printerName = 'Microsoft Print to PDF';
 
-// 暂停任务
+// Pause job
 await pauseJob(printerName, jobId);
 
-// 恢复任务
+// Resume job
 await resumeJob(printerName, jobId);
 
-// 重启任务
+// Restart job
 await restartJob(printerName, jobId);
 
-// 删除任务
+// Remove job
 await removeJob(printerName, jobId);
 ```
 
-## 📋 示例
+## 📋 Examples
 
-### 实际应用场景
+### Real-world Use Cases
 
-#### 1. 打印发票或报告
+#### 1. Print Invoice or Report
 
 ```javascript
-import { printHtml, getPrinters } from 'tauri-plugin-printer-v2';
+import { printHtml, getPrinters } from 'tauri-plugin-printer-wkhtml-bin';
 
-// 生成发票HTML
+// Generate invoice HTML
 const invoiceHtml = `
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
-    <title>发票</title>
+    <title>Invoice</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         .header { text-align: center; margin-bottom: 30px; }
@@ -248,39 +248,39 @@ const invoiceHtml = `
 </head>
 <body>
     <div class="header">
-        <h1>发票</h1>
-        <p>发票号码: INV-2024-001</p>
+        <h1>Invoice</h1>
+        <p>Invoice No: INV-2024-001</p>
     </div>
     <div class="invoice-details">
-        <p><strong>客户:</strong> 张三</p>
-        <p><strong>日期:</strong> 2024-01-15</p>
+        <p><strong>Customer:</strong> Zhang San</p>
+        <p><strong>Date:</strong> 2024-01-15</p>
     </div>
     <table>
-        <tr><th>项目</th><th>数量</th><th>单价</th><th>总计</th></tr>
-        <tr><td>产品A</td><td>2</td><td>¥100</td><td>¥200</td></tr>
-        <tr><td>产品B</td><td>1</td><td>¥150</td><td>¥150</td></tr>
+        <tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+        <tr><td>Product A</td><td>2</td><td>¥100</td><td>¥200</td></tr>
+        <tr><td>Product B</td><td>1</td><td>¥150</td><td>¥150</td></tr>
     </table>
     <p style="text-align: right; margin-top: 20px;"><strong>总计: ¥350</strong></p>
 </body>
 </html>
 `;
 
-// 打印发票
+// Print invoice
 try {
     const result = await printHtml({
         html: invoiceHtml,
         printer: 'Microsoft Print to PDF' // 或选择其他打印机
     });
-    console.log('发票打印成功:', result);
+    console.log('Invoice printed successfully:', result);
 } catch (error) {
-    console.error('打印失败:', error);
+    console.error('Printing failed:', error);
 }
 ```
 
-#### 2. 批量打印PDF文件
+#### 2. Batch Print PDF Files
 
 ```javascript
-import { printPdf, getPrinters } from 'tauri-plugin-printer-v2';
+import { printPdf, getPrinters } from 'tauri-plugin-printer-wkhtml-bin';
 
 const pdfFiles = [
     '/path/to/document1.pdf',
@@ -288,130 +288,130 @@ const pdfFiles = [
     '/path/to/document3.pdf'
 ];
 
-// 获取默认打印机
+// Get default printer
 const printers = JSON.parse(await getPrinters());
 const defaultPrinter = printers.find(p => p.is_default)?.name || printers[0]?.name;
 
-// 批量打印
+// Batch print
 for (const filePath of pdfFiles) {
     try {
         await printPdf({
             path: filePath,
             printer: defaultPrinter,
-            pages: '1-10' // 只打印前10页
+            pages: '1-10' // Print only the first 10 pages
         });
-        console.log(`已打印: ${filePath}`);
+        console.log(`Printed: ${filePath}`);
     } catch (error) {
-        console.error(`打印失败 ${filePath}:`, error);
+        console.error(`Print failed ${filePath}:`, error);
     }
 }
 ```
 
-#### 3. 打印机状态监控
+#### 3. Printer Status Monitoring
 
 ```javascript
-import { getPrinters, getJobs } from 'tauri-plugin-printer-v2';
+import { getPrinters, getJobs } from 'tauri-plugin-printer-wkhtml-bin';
 
-// 监控打印机状态
+// Monitor printer status
 async function monitorPrinters() {
     try {
         const printers = JSON.parse(await getPrinters());
         
         for (const printer of printers) {
-            console.log(`打印机: ${printer.name}`);
-            console.log(`状态: ${printer.status}`);
-            console.log(`是否默认: ${printer.is_default ? '是' : '否'}`);
+            console.log(`Printer: ${printer.name}`);
+            console.log(`Status: ${printer.status}`);
+            console.log(`Default: ${printer.is_default ? 'Yes' : 'No'}`);
             
-            // 获取打印任务
+            // Get print jobs
             const jobs = JSON.parse(await getJobs(printer.name));
-            console.log(`待处理任务: ${jobs.length}`);
+            console.log(`Pending jobs: ${jobs.length}`);
             
             console.log('---');
         }
     } catch (error) {
-        console.error('获取打印机信息失败:', error);
+        console.error('Failed to get printer info:', error);
     }
 }
 
-// 每30秒检查一次
+// Check every 30 seconds
 setInterval(monitorPrinters, 30000);
 ```
 
-## 📚 API 文档
+## 📚 API Documentation
 
 ### `ping(request: PingRequest): Promise<PingResponse>`
-测试插件连接状态。
+Test plugin connection status.
 
 ### `getPrinters(): Promise<string>`
-获取系统中所有可用的打印机列表，返回 JSON 格式的字符串。
+Get all available printers in the system, returned as a JSON string.
 
 ### `getPrintersByName(name: string): Promise<string>`
-根据打印机名称获取特定打印机信息。
+Get info of a specific printer by name.
 
 ### `printPdf(options: PrintOptions): Promise<string>`
-打印 PDF 文件。
+Print PDF files.
 
-**PrintOptions 参数：**
-- `path`: PDF 文件路径
-- `printer`: 打印机名称
-- `pages`: 页面范围（可选）
-- `subset`: 页面子集（可选）
+**PrintOptions parameters:**
+- `path`: PDF file path
+- `printer`: Printer name
+- `pages`: Page range (optional)
+- `subset`: Page subset (optional)
 
 ### `printHtml(options: HtmlPrintOptions): Promise<string>`
-打印 HTML 内容。
+Print HTML content.
 
-**HtmlPrintOptions 参数：**
-- `html`: HTML 内容字符串
-- `printer`: 打印机名称
+**HtmlPrintOptions parameters:**
+- `html`: HTML content string
+- `printer`: Printer name
 
-### 打印任务管理
+### Print Job Management
 
-- `getJobs(printer: string): Promise<string>` - 获取打印机的所有任务
-- `getJobsById(printer: string, jobId: string): Promise<string>` - 获取特定任务信息
-- `pauseJob(printer: string, jobId: string): Promise<string>` - 暂停打印任务
-- `resumeJob(printer: string, jobId: string): Promise<string>` - 恢复打印任务
-- `restartJob(printer: string, jobId: string): Promise<string>` - 重启打印任务
-- `removeJob(printer: string, jobId: string): Promise<string>` - 删除打印任务
+- `getJobs(printer: string): Promise<string>` - Get all jobs for a printer
+- `getJobsById(printer: string, jobId: string): Promise<string>` - Get info for a specific job
+- `pauseJob(printer: string, jobId: string): Promise<string>` - Pause a print job
+- `resumeJob(printer: string, jobId: string): Promise<string>` - Resume a print job
+- `restartJob(printer: string, jobId: string): Promise<string>` - Restart a print job
+- `removeJob(printer: string, jobId: string): Promise<string>` - Delete a print job
 
-## 🛠️ 开发
+## 🛠️ Development
 
-### 运行示例应用
+### Run Example Application
 
 ```bash
-# 克隆仓库
-git clone https://github.com/chen-collab/tauri-plugin-printer.git
+# Clone repository
+git clone https://github.com/FrancoJFerreyra/tauri-plugin-printer.git
 cd tauri-plugin-printer
 
-# 构建插件
+# Build plugin
 npm run build
 
-# 运行示例应用
+# Run example app
 cd examples/tauri-app
 npm install
 npm run tauri:dev
 ```
 
-### 项目结构
+### Project Structure
 
 ```
 tauri-plugin-printer/
-├── src/                    # Rust 源代码
-│   ├── lib.rs             # 插件主入口
-│   ├── commands.rs        # Tauri 命令定义
-│   ├── desktop.rs         # 桌面端实现
-│   ├── windows.rs         # Windows 特定实现
-│   └── ...
-├── guest-js/              # JavaScript API
-│   └── index.ts           # 前端 API 定义
-├── permissions/           # 权限配置
-├── examples/              # 示例应用
-│   └── tauri-app/         # Vue.js 示例
-└── dist-js/               # 构建后的 JS 文件
+├── src/ # Rust source code
+│ ├── lib.rs # Main plugin entrypoint
+│ ├── commands.rs # Tauri command definitions
+│ ├── desktop.rs # Desktop implementation
+│ ├── windows.rs # Windows specific implementation
+│ └── ...
+├── guest-js/ # JavaScript API
+│ └── index.ts # Frontend API definition
+├── permissions/ # Permission config
+├── examples/ # Sample apps
+│ └── tauri-app/ # Vue.js example
+└── dist-js/ # Built JS files
 ```
 
-## 🔧 权限配置
+## 🔧 Permission Configuration
 
-插件使用以下权限：
+The plugin uses the following permissions:
 
 ```toml
 [default]
@@ -433,90 +433,89 @@ permissions = [
 ]
 ```
 
-## 🐛 已知问题
+## 🐛 Known Issues
 
-- 目前主要支持 Windows 系统
-- 某些打印机驱动可能不完全兼容
-- 大文件打印可能需要额外的内存管理
-- HTML 打印在某些复杂布局下可能出现格式问题
+- Currently supports Windows systems mainly
+- Some printer drivers may not be fully compatible
+- Printing large files may need extra memory management
+- HTML printing may have formatting issues with complex layouts
 
-## 🔧 故障排除
+## 🔧 Troubleshooting
 
-### 常见问题
+### Common Issues
 
-#### Q: 无法获取打印机列表
-**A:** 请检查以下几点：
-- 确保系统中已安装打印机
-- 检查打印机服务是否正常运行
-- 确认应用具有访问打印机的权限
+#### Q: Cannot retrieve printer list
+**A:** Check:
+- Ensure a printer is installed on your system
+- Ensure the printer service is running correctly
+- Confirm the app has printer access permissions
 
-#### Q: PDF 打印失败
-**A:** 可能的解决方案：
-- 确保 PDF 文件路径正确且文件存在
-- 检查 PDF 文件是否损坏
-- 确认系统已安装 PDF 阅读器（如 Adobe Reader）
-- 尝试使用绝对路径而非相对路径
+#### Q: PDF printing fails
+**A:** Possible solutions:
+- Ensure the PDF file path is correct and file exists
+- Check if the PDF file is corrupted
+- Ensure a PDF reader (like Adobe Reader) is installed
+- Try using absolute paths rather than relative
 
-#### Q: HTML 打印格式不正确
-**A:** 建议：
-- 使用简单的 CSS 样式，避免复杂的布局
-- 设置合适的页面大小和边距
-- 测试时先打印到 PDF 查看效果
-- 避免使用 JavaScript 和外部资源
+#### Q: HTML print formatting issues
+**A:** Suggestions:
+- Use simple CSS styles, avoid complex layouts
+- Set appropriate page size and margins
+- Preview by printing to PDF first
+- Avoid JavaScript and external resources
 
-#### Q: 权限配置问题
-**A:** 确保在 `src-tauri/capabilities/default.json` 中正确配置了权限：
+#### Q: Permission configuration issues
+**A:** Ensure configuration in `src-tauri/capabilities/default.json`:
 ```json
 {
   "permissions": [
-    "printer:allow-ping",
-    "printer:allow-get-printers",
-    "printer:allow-get-printers-by-name",
-    "printer:allow-print-pdf",
-    "printer:allow-print-html",
-    "printer:allow-get-jobs",
-    "printer:allow-restart-job",
-    "printer:allow-pause-job",
-    "printer:allow-resume-job",
-    "printer:allow-remove-job"
+    "printer-wkhtml-bin:allow-ping",
+    "printer-wkhtml-bin:allow-get-printers",
+    "printer-wkhtml-bin:allow-get-printers-by-name",
+    "printer-wkhtml-bin:allow-print-pdf",
+    "printer-wkhtml-bin:allow-print-html",
+    "printer-wkhtml-bin:allow-get-jobs",
+    "printer-wkhtml-bin:allow-restart-job",
+    "printer-wkhtml-bin:allow-pause-job",
+    "printer-wkhtml-bin:allow-resume-job",
+    "printer-wkhtml-bin:allow-remove-job"
   ]
 }
 ```
 
-### 调试技巧
+### Debugging Tips
 
-1. **启用详细日志**：
+1. **Enable detailed logs**:
    ```bash
    RUST_LOG=debug npm run tauri dev
    ```
 
-2. **检查打印机状态**：
+2. **Check printer status**:
    ```javascript
    const printers = JSON.parse(await getPrinters());
-   console.log('可用打印机:', printers);
+   console.log('Available printers:', printers);
    ```
 
-3. **测试连接**：
+3. **Test connection**:
    ```javascript
    try {
      const result = await ping();
-     console.log('插件连接正常:', result);
+     console.log('Plugin connected:', result);
    } catch (error) {
-     console.error('插件连接失败:', error);
+     console.error('Plugin connection failed:', error);
    }
    ```
 
-## ⚡ 性能优化
+## ⚡ Performance Optimization
 
-### 最佳实践
+### Best Practices
 
-#### 1. 打印大文件时的优化
-
+#### 1. Optimize large file printing
 ```javascript
-// 对于大型PDF文件，建议分页打印
+// For large PDF files, suggest printing by page batches
 const largePdfPath = '/path/to/large-document.pdf';
 
-// 分批打印，每次10页
+// Print in batches, 10 pages each time
 for (let startPage = 1; startPage <= totalPages; startPage += 10) {
     const endPage = Math.min(startPage + 9, totalPages);
     
@@ -526,29 +525,29 @@ for (let startPage = 1; startPage <= totalPages; startPage += 10) {
         pages: `${startPage}-${endPage}`
     });
     
-    // 添加延迟避免打印队列过载
+    // Add delay to avoid overloading the print queue
     await new Promise(resolve => setTimeout(resolve, 1000));
 }
 ```
 
-#### 2. HTML 打印优化
+#### 2. HTML print optimization
 
 ```javascript
-// 优化的HTML结构
+// Optimized HTML structure
 const optimizedHtml = `
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <style>
-        /* 打印专用样式 */
+        /* Print styles */
         @media print {
             body { margin: 0; padding: 20px; }
             .no-print { display: none; }
             .page-break { page-break-before: always; }
         }
         
-        /* 基础样式 */
+        /* Basic style */
         body {
             font-family: 'Arial', sans-serif;
             font-size: 12pt;
@@ -569,47 +568,47 @@ const optimizedHtml = `
     </style>
 </head>
 <body>
-    <!-- 内容 -->
+    <!-- Content -->
 </body>
 </html>
 `;
 ```
 
-#### 3. 错误处理和重试机制
+#### 3. Error Handling and Retries
 
 ```javascript
-// 带重试的打印函数
+// Print function with retry logic
 async function printWithRetry(printFunction, options, maxRetries = 3) {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
             const result = await printFunction(options);
             return result;
         } catch (error) {
-            console.warn(`打印尝试 ${attempt} 失败:`, error.message);
+             console.warn(`Print attempt ${attempt} failed:`, error.message);
             
             if (attempt === maxRetries) {
-                throw new Error(`打印失败，已重试 ${maxRetries} 次: ${error.message}`);
+                throw new Error(`Print failed after ${maxRetries} retries: ${error.message}`);
             }
             
-            // 指数退避延迟
+            // Exponential backoff delay
             const delay = Math.pow(2, attempt) * 1000;
             await new Promise(resolve => setTimeout(resolve, delay));
         }
     }
 }
 
-// 使用示例
+// Usage
 try {
     await printWithRetry(printPdf, {
         path: '/path/to/document.pdf',
         printer: 'HP LaserJet'
     });
 } catch (error) {
-    console.error('最终打印失败:', error);
+    console.error('Final print failed:', error);
 }
 ```
 
-#### 4. 打印队列管理
+#### 4. Print Queue Management 
 
 ```javascript
 class PrintQueue {
@@ -643,59 +642,45 @@ class PrintQueue {
     }
 }
 
-// 使用打印队列
-const printQueue = new PrintQueue(2); // 最多同时2个打印任务
+// Using the print queue
+const printQueue = new PrintQueue(2); // up to 2 concurrent print jobs
 
-// 添加打印任务
+// Add print tasks
 const files = ['file1.pdf', 'file2.pdf', 'file3.pdf'];
 for (const file of files) {
     printQueue.add(() => printPdf({ path: file, printer: 'Default' }));
 }
 ```
 
-### 内存管理
+### Memory Management
 
-- **避免在内存中保存大量HTML内容**
-- **及时清理打印任务引用**
-- **使用流式处理大文件**
-- **定期检查和清理打印队列**
+- **Avoid storing large amounts of HTML in memory**
+- **Clean up print job references promptly**
+- **Use streaming for large file handling**
+- **Regularly monitor and clear the print queue**
 
-## 🤝 贡献
+## 🤝 Contributing
 
-欢迎提交 Issue 和 Pull Request！
+Issues and Pull Requests are welcome!
 
-## 📄 许可证
+## 📄 License
 
 MIT License
 
-## 🙏 致谢
+## 🙏 Acknowledgements
 
-本项目基于以下仓库开发：
+This project is based on:
 
 - [Alfian Lensun's Original Plugin Repository](https://github.com/alfianlensundev/tauri-plugin-printer)
 - [adao99's Fork for Tauri V2 Beta](https://github.com/adao99/tauri-plugin-printer-v2)
+- [chen-collab's](https://github.com/chen-collab/tauri-plugin-printer)
 
-感谢原作者的贡献！
+Thanks to the original authors!
 
-## 📝 更新日志
+## 📝 Changelog
 
-### v0.2.0 (最新)
-- ✨ **新增 HTML 打印功能** - 支持直接打印 HTML 内容
-- 🔧 **改进错误处理** - 更详细的错误信息和调试支持
-- 📚 **完善文档** - 添加详细的使用示例和故障排除指南
-- ⚡ **性能优化** - 改进大文件打印和内存管理
-- 🛡️ **增强权限控制** - 新增 `allow-print-html` 权限
-- 🐛 **修复已知问题** - 解决打印机状态获取和任务管理的稳定性问题
-
-### v0.1.1
-- 🐛 修复打印机列表获取问题
-- 📖 改进 API 文档
-- 🔧 优化错误处理机制
-
-### v0.1.0
-- 🎉 初始版本发布
-- ✅ 兼容 Tauri V2 稳定版
-- ✅ 修复中文打印机名称乱码问题
-- ✅ 添加 ping 命令
-- ✅ 完善权限配置
-- ✅ 提供完整的示例应用
+### v0.1.0 (current)
+- 🎉 Initial release of this fork
+- 🔧 Fixes TypeScript types in the API
+- 🛠️ Updates comments from Chinese to English
+- 📦 Looks for `wkhtmltopdf` in the `bin` folder inside `src-tauri`

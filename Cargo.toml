@@ -1,17 +1,20 @@
 [package]
-name = "tauri-plugin-printer-v2"
-version = "0.2.0"
-authors = [ "chen-collab" ]
-description = "Tauri plugin for printing"
+name = "tauri-plugin-printer-wkhtml-bin"
+version = "0.1.0"
+authors = ["Franco J. Ferreyra <ferreyrafranco0802@gmail.com>"]
+description = "Tauri plugin for printer with embedded wkhtmltopdf for Windows"
 edition = "2021"
-rust-version = "1.77.2"
-exclude = ["/examples", "/dist-js",  "/node_modules"]
-links = "tauri-plugin-printer"
 license = "MIT"
-repository = "https://github.com/chen-collab/tauri-plugin-printer"
-keywords = ["tauri", "plugin", "printer"]
+repository = "https://github.com/FrancoJFerreyra/tauri-plugin-printer"
+keywords = ["tauri", "plugin", "printer", "windows"]
 categories = ["api-bindings", "development-tools"]
-email = "18668070425@163.com"
+readme = "README.md"
+links = "tauri-plugin-printer-wkhtml-bin"
+
+exclude = ["/examples", "/dist-js", "/node_modules"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 tauri = { version = "2.7.0" }

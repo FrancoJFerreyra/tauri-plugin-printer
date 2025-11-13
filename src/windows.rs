@@ -8,6 +8,28 @@ use std::env;
 use std::path::{Path, PathBuf};
 use crate::declare::{PrintOptions, PrintHtmlOptions};
 use crate::{ fsys::remove_file};
+use std::os::windows::process::CommandExt;
+
+fn wkhtmltopdf_path() -> PathBuf {
+    let exe = env::current_exe().unwrap();
+    let exe_dir = exe.parent().unwrap();
+
+    // First try next to the .exe
+    let direct = exe_dir.join("wkhtmltopdf.exe");
+    if direct.exists() {
+        return direct;
+    }
+
+    // If not there, try in bin/
+    let bin = exe_dir.join("bin").join("wkhtmltopdf.exe");
+    if bin.exists() {
+        return bin;
+    }
+
+    // If still not found → clearer error
+    panic!("wkhtmltopdf.exe not found next to the executable or in bin/");
+}
+
 /**
  * Create sm.exe to temp
  */
@@ -19,7 +41,6 @@ fn create_file(path: String, bin: &[u8]) -> std::io::Result<()> {
     Ok(())
 }
 
-  
 /**
  * init sm.exe
  */
@@ -28,7 +49,7 @@ pub fn init_windows() {
     let dir: std::path::PathBuf = env::temp_dir();
     let result: Result<(), std::io::Error>  = create_file(dir.display().to_string(),sm);
     if result.is_err() {
-        panic!("Gagal")
+        panic!("Failed to initialize sm.exe")
     }
 }
 
@@ -41,8 +62,6 @@ pub fn get_printers() -> String {
 
     // Spawn a new thread
     thread::spawn(move || {
-        // let output: tauri_plugin_shell::process::Output = Command::new("powershell").args(["Get-Printer | Select-Object Name, DriverName, JobCount, PrintProcessor, PortName, ShareName, ComputerName, PrinterStatus, Shared, Type, Priority | ConvertTo-Json"]).output().unwrap();
-
         let output = Command::new("powershell")
             .args(["-Command", "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Get-Printer | Select-Object Name, DriverName, JobCount, PrintProcessor, PortName, ShareName, ComputerName, PrinterStatus, Shared, Type, Priority | ConvertTo-Json"])
             .output().unwrap();
@@ -51,11 +70,8 @@ pub fn get_printers() -> String {
         sender.send(output_string).unwrap();
     });
 
-    // Do other non-blocking work on the main thread
-
     // Receive the result from the spawned thread
     let result: String = receiver.recv().unwrap();
-
 
     return result;
 }
@@ -104,11 +120,11 @@ pub fn print_pdf (options: PrintOptions) -> String {
     println!("{}", shell_command);
     // Spawn a new thread
     thread::spawn(move || {
-        // let output: tauri_plugin_shell::process::Output = Command::new("powershell").args([shell_command]).output().unwrap();
-
-        // sender.send(output.stdout.to_string()).unwrap();
-
-        let output = Command::new("powershell").args([shell_command]).output().unwrap();
+        let output = Command::new("powershell")
+                        .creation_flags(0x08000000) //prevents open console window on windows
+                        .args([shell_command])
+                        .output()
+                        .unwrap();
 
         sender.send(String::from_utf8(output.stdout).unwrap()).unwrap();
     });
@@ -127,84 +143,80 @@ pub fn print_pdf (options: PrintOptions) -> String {
     return result;
 }
 
-
-
-
 /**
- * 打印 HTML 内容
+ * Print HTML content
  * 
- * 优化特性:
- * - 改进的错误处理和资源管理
- * - 更好的临时文件清理机制
- * - 增强的 wkhtmltopdf 参数配置
- * - 支持更多打印选项和边距单位
+ * Optimizations:
+ * - Improved error handling and resource management
+ * - Better temporary file cleanup mechanism
+ * - Enhanced wkhtmltopdf parameter configuration
+ * - Support for more print options and margin units
  */
 pub fn print_html(options: PrintHtmlOptions) -> String {
-    // 使用 Result 类型进行更好的错误处理
+    // Use Result type for better error handling
     match print_html_internal(options) {
         Ok(result) => result,
         Err(e) => {
-            eprintln!("HTML 打印失败: {}", e);
-            format!("打印失败: {}", e)
+            eprintln!("HTML printing failed: {}", e);
+            format!("Printing failed: {}", e)
         }
     }
 }
 
-/// 生成唯一的临时文件路径
+/// Generate unique temporary file path
 fn generate_temp_file_path(extension: &str) -> Result<PathBuf, String> {
     let temp_dir = env::temp_dir();
     let timestamp = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
-        .map_err(|e| format!("获取时间戳失败: {}", e))?
+        .map_err(|e| format!("Failed to get timestamp: {}", e))?
         .as_nanos();
     let filename = format!("tauri_printer_{}_{}.{}", std::process::id(), timestamp, extension);
     Ok(temp_dir.join(filename))
 }
 
-/// 内部实现函数，使用 Result 进行错误处理
+/// Internal implementation function, uses Result for error handling
 fn print_html_internal(options: PrintHtmlOptions) -> Result<String, String> {
-    // 验证 HTML 内容
+    // Validate HTML content
     if options.html.trim().is_empty() {
-        return Err("HTML 内容不能为空".to_string());
+        return Err("HTML content cannot be empty".to_string());
     }
 
-    // 检查 wkhtmltopdf 是否可用
+    // Check wkhtmltopdf availability
     check_wkhtmltopdf_availability()?;
 
-    // 生成临时文件路径
+    // Generate temporary file paths
     let html_path = generate_temp_file_path("html")?;
     let pdf_path = generate_temp_file_path("pdf")?;
     
     println!("html_path: {:?}, pdf_path: {:?}", html_path, pdf_path);
 
-    // 写入 HTML 内容到临时文件
+    // Write HTML content to temp file
     std::fs::write(&html_path, &options.html)
-        .map_err(|e| format!("写入 HTML 内容失败: {}", e))?;
+        .map_err(|e| format!("Failed to write HTML content: {}", e))?;
 
-    // 构建 wkhtmltopdf 命令参数
+    // Build wkhtmltopdf command arguments
     let args = build_wkhtmltopdf_args(&options, &html_path, &pdf_path)?;
 
     println!("wkhtmltopdf args: {:?}", args);
 
-    // 执行 HTML 到 PDF 转换
+    // Execute HTML to PDF conversion
     let conversion_result = execute_wkhtmltopdf(&args);
     
-    // 如果转换失败，清理 HTML 文件并返回错误
+    // If conversion fails, clean HTML file and return error
     if let Err(e) = conversion_result {
         let _ = remove_file(&html_path.to_string_lossy());
         return Err(e);
     }
 
-    // 验证 PDF 文件是否生成成功
+    // Check if PDF file was successfully generated
     if !pdf_path.exists() {
-        // 清理 HTML 文件
         let _ = remove_file(&html_path.to_string_lossy());
-        return Err("PDF 文件生成失败".to_string());
+        return Err("PDF file generation failed".to_string());
     }
     
-    println!("PDF 文件生成成功: {:?}", pdf_path);
+    println!("PDF file generated successfully: {:?}", pdf_path);
 
-    // 创建打印选项并执行打印
+    // Create print options and execute printing
     let print_options = PrintOptions {
         path: pdf_path.to_string_lossy().to_string(),
         id: options.printer_id.unwrap_or_default(),
@@ -212,25 +224,26 @@ fn print_html_internal(options: PrintHtmlOptions) -> Result<String, String> {
         remove_after_print: options.remove_after_print.unwrap_or(true),
     };
 
-    // 执行打印
+    // Execute print
     let result = print_pdf(print_options);
 
-    // 清理 HTML 临时文件（PDF 文件由 print_pdf 函数根据 remove_after_print 选项处理）
+    // Clean HTML temp file (PDF handled by print_pdf based on remove_after_print)
     let _ = remove_file(&html_path.to_string_lossy());
     
     Ok(result)
 }
 
-/// 检查 wkhtmltopdf 是否可用
+/// Check wkhtmltopdf availability
 fn check_wkhtmltopdf_availability() -> Result<(), String> {
-    Command::new("wkhtmltopdf")
+    Command::new(wkhtmltopdf_path())
+        .creation_flags(0x08000000) //prevents open console window on windows
         .arg("--version")
         .output()
-        .map_err(|_| "wkhtmltopdf 未安装或不在 PATH 中。请先安装 wkhtmltopdf。".to_string())?;
+        .map_err(|_| "wkhtmltopdf is not installed or not in PATH. Please install wkhtmltopdf first.".to_string())?;
     Ok(())
 }
 
-/// 构建 wkhtmltopdf 命令参数
+/// Build wkhtmltopdf command arguments
 fn build_wkhtmltopdf_args(
     options: &PrintHtmlOptions,
     html_path: &Path,
@@ -240,16 +253,16 @@ fn build_wkhtmltopdf_args(
         "--encoding".to_string(),
         "UTF-8".to_string(),
         "--enable-local-file-access".to_string(),
-        "--disable-smart-shrinking".to_string(), // 禁用智能缩放以获得更好的打印质量
+        "--disable-smart-shrinking".to_string(), // disable smart shrinking for better print quality
         "--print-media-type".to_string(),
-        "--no-pdf-compression".to_string(),      // 禁用 PDF 压缩以提高质量
+        "--no-pdf-compression".to_string(),      // disable PDF compression for higher quality
         "--load-error-handling".to_string(),
-        "ignore".to_string(),                    // 忽略加载错误
+        "ignore".to_string(),                    // ignore load errors
         "--load-media-error-handling".to_string(),
-        "ignore".to_string(),                    // 忽略媒体加载错误
+        "ignore".to_string(),                    // ignore media load errors
     ];
 
-    // 设置默认边距
+    // Set default margins
     let default_margin = "10mm";
     args.extend([
         "--margin-top".to_string(),
@@ -262,21 +275,21 @@ fn build_wkhtmltopdf_args(
         default_margin.to_string(),
     ]);
 
-    // 设置页面大小
+    // Set page size
     if let Some(ref page_size) = options.page_size {
         args.extend(["--page-size".to_string(), page_size.clone()]);
     } else {
         args.extend(["--page-size".to_string(), "A4".to_string()]);
     }
 
-    // 设置方向
+    // Set orientation
     if let Some(ref orientation) = options.orientation {
         args.extend(["--orientation".to_string(), orientation.clone()]);
     } else {
         args.extend(["--orientation".to_string(), "Portrait".to_string()]);
     }
 
-    // 设置自定义边距（会覆盖默认边距）
+    // Set custom margins (overrides default margins)
     if let Some(ref margin) = options.margin {
         let unit = margin.unit.as_deref().unwrap_or("mm");
         
@@ -294,25 +307,26 @@ fn build_wkhtmltopdf_args(
         }
     }
 
-    // 添加输入和输出文件路径
+    // Add input and output file paths
     args.push(html_path.to_string_lossy().to_string());
     args.push(pdf_path.to_string_lossy().to_string());
 
     Ok(args)
 }
 
-/// 执行 wkhtmltopdf 命令
+/// Execute wkhtmltopdf command
 fn execute_wkhtmltopdf(args: &[String]) -> Result<(), String> {
-    let output = Command::new("wkhtmltopdf")
+    let output = Command::new(wkhtmltopdf_path())
+        .creation_flags(0x08000000) //prevents open console window on windows
         .args(args)
         .output()
-        .map_err(|e| format!("执行 wkhtmltopdf 失败: {}", e))?;
+        .map_err(|e| format!("Failed to execute wkhtmltopdf: {}", e))?;
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
         let stdout = String::from_utf8_lossy(&output.stdout);
         return Err(format!(
-            "wkhtmltopdf 转换失败 (退出码: {})\n标准错误: {}\n标准输出: {}",
+            "wkhtmltopdf conversion failed (exit code: {})\nStderr: {}\nStdout: {}",
             output.status.code().unwrap_or(-1),
             stderr,
             stdout
@@ -326,9 +340,6 @@ fn execute_wkhtmltopdf(args: &[String]) -> Result<(), String> {
  * Get printer job on windows using powershell
  */
 pub fn get_jobs(printername: String) -> String {
-    // let output = Command::new("powershell").args([format!("Get-PrintJob -PrinterName \"{}\"  | Select-Object DocumentName,Id,TotalPages,Position,Size,SubmmitedTime,UserName,PagesPrinted,JobTime,ComputerName,Datatype,PrinterName,Priority,SubmittedTime,JobStatus | ConvertTo-Json", printername)]).output().unwrap();
-    // return output.stdout.to_string();
-
     let output = Command::new("powershell").args([format!("Get-PrintJob -PrinterName \"{}\"  | Select-Object DocumentName,Id,TotalPages,Position,Size,SubmmitedTime,UserName,PagesPrinted,JobTime,ComputerName,Datatype,PrinterName,Priority,SubmittedTime,JobStatus | ConvertTo-Json", printername)]).output().unwrap();
     return String::from_utf8(output.stdout).unwrap();
 }
@@ -337,21 +348,14 @@ pub fn get_jobs(printername: String) -> String {
  * Get printer job by id on windows using powershell
  */
 pub fn get_jobs_by_id(printername: String, jobid: String) -> String {
-    // let output = Command::new("powershell").args([format!("Get-PrintJob -PrinterName \"{}\" -ID \"{}\"  | Select-Object DocumentName,Id,TotalPages,Position,Size,SubmmitedTime,UserName,PagesPrinted,JobTime,ComputerName,Datatype,PrinterName,Priority,SubmittedTime,JobStatus | ConvertTo-Json", printername, jobid)]).output().unwrap();
-    // return output.stdout.to_string();
-
     let output = Command::new("powershell").args([format!("Get-PrintJob -PrinterName \"{}\" -ID \"{}\"  | Select-Object DocumentName,Id,TotalPages,Position,Size,SubmmitedTime,UserName,PagesPrinted,JobTime,ComputerName,Datatype,PrinterName,Priority,SubmittedTime,JobStatus | ConvertTo-Json", printername, jobid)]).output().unwrap();
     return String::from_utf8(output.stdout).unwrap();
 }
-
 
 /**
  * Resume printers job on windows using powershell
  */
 pub fn resume_job(printername: String, jobid: String) -> String {
-    // let output = Command::new("powershell").args([format!("Resume-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
-    // return output.stdout.to_string();
-
     let output = Command::new("powershell").args([format!("Resume-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
     return String::from_utf8(output.stdout).unwrap();
 }
@@ -360,30 +364,22 @@ pub fn resume_job(printername: String, jobid: String) -> String {
  * Restart printers job on windows using powershell
  */
 pub fn restart_job(printername: String, jobid: String) -> String {
-    // let output = Command::new("powershell").args([format!("Restart-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
-    // return output.stdout.to_string();
-
     let output = Command::new("powershell").args([format!("Restart-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
     return String::from_utf8(output.stdout).unwrap();
 }
 
 /**
- * pause printers job on windows using powershell
+ * Pause printers job on windows using powershell
  */
 pub fn pause_job(printername: String, jobid: String) -> String {
-    // let output = Command::new("powershell").args([format!("Suspend-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
-    // return output.stdout.to_string();
-
     let output = Command::new("powershell").args([format!("Suspend-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
     return String::from_utf8(output.stdout).unwrap();
 }
 
 /**
- * remove printers job on windows using powershell
+ * Remove printers job on windows using powershell
  */
 pub fn remove_job(printername: String, jobid: String) -> String {
-    // let output = Command::new("powershell").args([format!("Remove-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
-    // return output.stdout.to_string();
     let output = Command::new("powershell").args([format!("Remove-PrintJob -PrinterName \"{}\" -ID \"{}\" ", printername, jobid)]).output().unwrap();
     return String::from_utf8(output.stdout).unwrap();
 }
