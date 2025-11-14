@@ -32,7 +32,7 @@ Supports PDF/HTML printing, printer management, print job control, and more.
 2. **Register the plugin**
    ```rust
    // src-tauri/src/lib.rs
-   use tauri_plugin_printer_v2::init;
+   use tauri_plugin_printer_wkhtml_bin::init;
    
    #[cfg_attr(mobile, tauri::mobile_entry_point)]
    pub fn run() {
@@ -113,7 +113,7 @@ npx tauri add https://github.com/FrancoJFerreyra/tauri-plugin-printer
 
 ```toml
 [dependencies]
-tauri-plugin-printer-wkhtml-bin = "0.2.0"
+tauri-plugin-printer-wkhtml-bin = "0.1.3"
 # Or use Git version
 # tauri-plugin-printer-wkhtml-bin = { git = "https://github.com/FrancoJFerreyra/tauri-plugin-printer" }
 ```
@@ -121,7 +121,7 @@ tauri-plugin-printer-wkhtml-bin = "0.2.0"
 2. Register the plugin in `src-tauri/src/lib.rs`:
 
 ```rust
-use tauri_plugin_printer_v2::init;
+use tauri_plugin_printer_wkhtml_bin::init;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -260,7 +260,7 @@ const invoiceHtml = `
         <tr><td>Product A</td><td>2</td><td>¥100</td><td>¥200</td></tr>
         <tr><td>Product B</td><td>1</td><td>¥150</td><td>¥150</td></tr>
     </table>
-    <p style="text-align: right; margin-top: 20px;"><strong>总计: ¥350</strong></p>
+    <p style="text-align: right; margin-top: 20px;"><strong>total: ¥350</strong></p>
 </body>
 </html>
 `;
@@ -269,7 +269,7 @@ const invoiceHtml = `
 try {
     const result = await printHtml({
         html: invoiceHtml,
-        printer: 'Microsoft Print to PDF' // 或选择其他打印机
+        printer: 'Microsoft Print to PDF' // Or choose another printer
     });
     console.log('Invoice printed successfully:', result);
 } catch (error) {
@@ -679,7 +679,16 @@ Thanks to the original authors!
 
 ## 📝 Changelog
 
-### v0.1.0 (current)
+### v0.1.3 (current)
+- 🛠️ Update README.md file
+
+### v0.1.2
+- 🛠️ Update README.md file
+
+### v0.1.1
+- 🔧 Fixes TypeScript types in the API
+
+### v0.1.0
 - 🎉 Initial release of this fork
 - 🔧 Fixes TypeScript types in the API
 - 🛠️ Updates comments from Chinese to English
