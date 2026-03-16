@@ -1,6 +1,6 @@
 {
   "name": "tauri-plugin-printer-wkhtml-bin",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Tauri printer plugin with embedded wkhtmltopdf for Windows",
   "author": "Franco J. Ferreyra",
   "license": "MIT",

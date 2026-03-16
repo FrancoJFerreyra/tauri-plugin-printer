@@ -103,28 +103,30 @@ pub fn get_printers_by_name(printername: String) -> String {
  * Print pdf file 
  */
 pub fn print_pdf (options: PrintOptions) -> String {
-    println!("options id {}", options.id);
-    println!("options print_setting {}", options.print_setting);
-
     let dir: std::path::PathBuf = env::temp_dir();
     let print_setting: String = options.print_setting;
-    let shell_command = if print_setting.is_empty() {
-        format!("{}sm.exe -print-to-default -silent \"{}\"", dir.display(), options.path)
+    let sm_path = dir.join("sm.exe");
+
+    let mut args: Vec<String> = Vec::new();
+    if print_setting.is_empty() {
+        args.push("-print-to-default".to_string());
     } else {
-        format!("{}sm.exe -print-to \"{}\" -silent \"{}\"", dir.display(), print_setting, options.path)
-    };
-    
+        args.push("-print-to".to_string());
+        args.push(print_setting);
+    }
+    args.push("-silent".to_string());
+    args.push(options.path.clone());
 
     // Create a channel for communication
     let (sender, receiver) = mpsc::channel();
-    println!("{}", shell_command);
-    // Spawn a new thread
+
+    // Spawn a new thread and execute sm.exe directly with no console window
     thread::spawn(move || {
-        let output = Command::new("powershell")
-                        .creation_flags(0x08000000) //prevents open console window on windows
-                        .args([shell_command])
-                        .output()
-                        .unwrap();
+        let output = Command::new(sm_path)
+            .creation_flags(0x08000000) // prevents opening a console window on Windows
+            .args(&args)
+            .output()
+            .unwrap();
 
         sender.send(String::from_utf8(output.stdout).unwrap()).unwrap();
     });
