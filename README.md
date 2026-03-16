@@ -679,6 +679,9 @@ Thanks to the original authors!
 
 ## 📝 Changelog
 
+### v0.1.4 (current)
+- 🛠️ Hide console on print
+
 ### v0.1.3 (current)
 - 🛠️ Update README.md file
 
